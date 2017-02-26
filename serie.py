@@ -13,6 +13,9 @@ class serie:
     def calc(self, numbers):
         numbers_string = ""
         secuence_list = ""
+        #Creating long string
+        # for n in range(1, numbers[1] + 1):
+        #     numbers_string += str(n)
 
         for n in range(1, numbers[1] + 1):
             if n >= numbers[0] and str(n) in secuence_list:
@@ -22,6 +25,8 @@ class serie:
                 numbers_string += str(n) + " "
 
         print(numbers_string)
+
+
 
 if __name__ == "__main__":
     try:
