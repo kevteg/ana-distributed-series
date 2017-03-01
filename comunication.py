@@ -31,7 +31,7 @@ def getOwnLinkLocal(interface):
             raise ValueError("Error: No IPv6 address for that interface ")
         return link_local
 def createMulticastSocket(group, MYPORT):
-    print("\033[0;0H")
+    # print("\033[0;0H")
     print("Talking to multicast IP: " + group + ", port: " + str(MYPORT))
     addrinfo = socket.getaddrinfo(group, MYPORT)[0]
     # Crea el socket del tipo IPv6
@@ -48,6 +48,7 @@ def createMulticastSocket(group, MYPORT):
         except Exception as e:
             continue
     interface = int
+    # interface = "docker0" 
     interface_index = socket.if_nametoindex(interface)
     # Unirse al grupo multicast
     group_bin = socket.inet_pton(addrinfo[0], addrinfo[4][0])

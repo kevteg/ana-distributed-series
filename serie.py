@@ -16,8 +16,7 @@ class serie:
             try:
                 start = time.time()
                 for n in range(1, numbers[1] + 1):
-                    if n >= numbers[0] and str(n) in secuence_list:
-                        print("Found a coincidence " + str(n))
+                    if str(n) in secuence_list:
                         coincidence_string.append(n)
                     else:
                         secuence_list += str(n)
@@ -26,13 +25,15 @@ class serie:
                 end = time.time()
             except Exception as ex:
                 print("Error: Have you passed all the arguments?")
-            print("Execution time: " + str(end - start) + " s")
-        return (coincidence_string, numbers_string)
+        return ((coincidence_string, numbers_string), str(end - start))
 
 if __name__ == "__main__":
     try:
         s = serie()
-        s.calc( (int(sys.argv[1]), int(sys.argv[2])) )
+        r = s.calc( (int(sys.argv[1]), int(sys.argv[2])) )
+        print("Calculated "+str(r[0][0]))
+        print("Complete interval "+str(r[0][1]))
+        print("Time "+str(r[1]))
     except Exception as e:
         print(e)
         print("Error: It has to be a number")
