@@ -182,9 +182,12 @@ class server:
                 print("\033["+self.current_pos()+";0H")
                 print("Connection stablished with client " + "#" + str(len(self.unicast_connections)) + " " + str(address))
                 self.unicast_connections.append(conn)
+                ping_client = threading.Thread(name='pingClient', target=self.pingClient, args=[conn, len(self.unicast_connections)])
                 new_con = threading.Thread(name='tcpConnection', target=self.tcpConnection, args=[conn])
                 new_con.start()
+                ping_client.start()
                 new_con.join(1)
+                ping_client.join(1)
             except Exception as e:
                 print(e)
                 self.waitclients = False
@@ -192,6 +195,15 @@ class server:
         # self.tcp_socket.close()
         # for sock in self.unicast_connections:
         #     sock.close()
+    def pingClient(self, client, number):
+        print("Pinging client " + str(number))
+        try:
+            while self.dowork:
+                time.sleep(0.5)
+                if client:
+                    self.sendToClient(client, "PING", False)
+        except Exception as e:
+            print("Stop pinging client " + str(number))
 
     def tcpConnection(self, client):
         data = ""
@@ -200,19 +212,23 @@ class server:
             while self.dowork:
                 data = client.recv(1024*100)
                 if len(data):
-                    print("\033["+self.current_pos()+";0H")
-                    print('Received from one client:', data)
-                    self.checkData(data)
+                    if "PING" not in data.decode():
+                        print("\033["+self.current_pos()+";0H")
+                        print('Received from one client:', data)
+                        self.checkData(data)
         except Exception as e:
             print(e)
         print("Closing connection with gone client")
-        if self.intervals_asa_clients[client]:
-            print("Going to calculate its data")
-            initial = self.intervals_asa_clients[client][0]
-            steps = self.intervals_asa_clients[client][1]
-            calculate_int = threading.Thread(name='cal_local_int', target=self.calculate_interval, args=[(initial,steps)])
-            calculate_int.start()
-            calculate_int.join(1)
+        try:
+            if self.intervals_asa_clients[client]:
+                print("Going to calculate its data")
+                initial = self.intervals_asa_clients[client][0]
+                steps = self.intervals_asa_clients[client][1]
+                calculate_int = threading.Thread(name='cal_local_int', target=self.calculate_interval, args=[(initial,steps)])
+                calculate_int.start()
+                calculate_int.join(1)
+        except Exception as e:
+            print("Gone client wasnt yet working")
         client.close()
     def checkData(self, data):
         try:
@@ -238,9 +254,10 @@ class server:
         print("Ana's serie: Information will be sent to clients now!")
         self.sendinfo = False
 
-    def sendToClient(self, client, data):
+    def sendToClient(self, client, data, visible = True):
         print("\033["+self.current_pos()+";0H")
-        print ('Sending to client :', data)
+        if visible:
+            print ('Sending to client :', data)
         client.send(data.encode())
 
     def sendToGroup(self, message):

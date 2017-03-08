@@ -60,8 +60,9 @@ class client:
             while self.dowork:
                 data = server.recv(1024).decode()
                 if len(data):
-                    print('Received from server: ', data)
-                    self.checkData(data)
+                    if "PING" not in data:
+                        print('Received from server: ', data)
+                        self.checkData(data)
         except Exception as e:
             print(e)
             print("Error")
@@ -83,11 +84,12 @@ class client:
                     print(e)
                     print("Error: server is no longer listening")
         except Exception as e:
-            print("No json")
+            self.sendToServer(self.unicast_connected_to, data, False)
 
 
-    def sendToServer(self, server, data):
-        print ('Sending to server :', data)
+    def sendToServer(self, server, data, visible = True):
+        if visible:
+            print ('Sending to server :', data)
         server.send(data.encode())
 
 

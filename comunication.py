@@ -48,7 +48,7 @@ def createMulticastSocket(group, MYPORT):
         except Exception as e:
             continue
     interface = int
-    # interface = "docker0" 
+    interface = "docker0" 
     interface_index = socket.if_nametoindex(interface)
     # Unirse al grupo multicast
     group_bin = socket.inet_pton(addrinfo[0], addrinfo[4][0])
